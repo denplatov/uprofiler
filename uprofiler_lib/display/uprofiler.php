@@ -154,6 +154,7 @@ function uprofiler_render_link($content, $href, $class='', $id='', $title='',
   }
 
   if ($href) {
+    $href = !empty($_GET['sub_dir']) ? $href . "&sub_dir=" . $_GET['sub_dir'] : $href;
     $link = '<a href="' . ($href) . '"';
   } else {
     $link = '<span';
@@ -1142,8 +1143,13 @@ function symbol_report($url_params,
   print("<br><h4><center>");
   print("Parent/Child $regr_impr report for <b>$rep_symbol</b>");
 
-  $callgraph_href = "$base_path/callgraph.php?"
-    . http_build_query(uprofiler_array_set($url_params, 'func', $rep_symbol));
+  $url_params = uprofiler_array_set($url_params, 'func', $rep_symbol);
+
+  if (!empty($_GET['sub_dir'])) {
+    $url_params = uprofiler_array_set($url_params, 'sub_dir', $_GET['sub_dir']);
+  }
+
+  $callgraph_href = "$base_path/callgraph.php?" . http_build_query($url_params);
 
   print(" <a href='$callgraph_href'>[View Callgraph $diff_text]</a><br>");
 

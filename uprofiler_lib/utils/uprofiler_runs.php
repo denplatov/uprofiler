@@ -105,6 +105,12 @@ class uprofilerRuns_Default implements iUprofilerRuns {
                      "ini param.");
       }
     }
+    if (!empty($_GET['sub_dir'])) {
+        $dir = $dir . '/' . $_GET['sub_dir'];
+    }
+    if(!is_dir($dir)) {
+        mkdir($dir);
+    }
     $this->dir = $dir;
   }
 
@@ -148,18 +154,38 @@ class uprofilerRuns_Default implements iUprofilerRuns {
 
   function list_runs() {
     if (is_dir($this->dir)) {
-        echo "<hr/>Existing runs:\n<ul>\n";
-        $files = glob("{$this->dir}/*.{$this->suffix}");
-        usort($files, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
-        foreach ($files as $file) {
-            list($run,$source) = explode('.', basename($file));
-            echo '<li><a href="' . htmlentities($_SERVER['SCRIPT_NAME'])
-                . '?run=' . htmlentities($run) . '&source='
-                . htmlentities($source) . '">'
-                . htmlentities(basename($file)) . "</a><small> "
-                . date("Y-m-d H:i:s", filemtime($file)) . "</small></li>\n";
-        }
-        echo "</ul>\n";
+      $this->list_dirs();
+      $this->list_files();
     }
+}
+
+  private function list_files() {
+    echo "<hr/>Existing runs:\n<ul>\n";
+    $files = glob("{$this->dir}/*.{$this->suffix}");
+    usort($files, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
+    foreach ($files as $file) {
+      list($run,$source) = explode('.', basename($file));
+      $base_href = htmlentities($_SERVER['SCRIPT_NAME']) . '?run='
+        . htmlentities($run) . '&source=' . htmlentities($source);
+      $href = (!empty($_GET['sub_dir'])) ? $base_href . '&sub_dir=' . $_GET['sub_dir'] : $base_href;
+      echo '<li><a href="' . $href . '">'
+        . htmlentities(basename($file)) . "</a><small> "
+        . date("Y-m-d H:i:s", filemtime($file)) . "</small></li>\n";
+    }
+    echo "</ul>\n";
+  }
+
+  private function list_dirs() {
+    echo "<hr/>Existing dirs:\n<ul>\n";
+    $dirs = glob("{$this->dir}/*", GLOB_ONLYDIR);
+    usort($dirs, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
+    foreach ($dirs as $dir) {
+      list($run,$source) = explode('.', basename($dir));
+        echo '<li><a href="'
+            . '?sub_dir=' . htmlentities(basename($dir)) . '">'
+            . htmlentities(basename($dir)) . "</a><small> "
+            . date("Y-m-d H:i:s", filemtime($dir)) . "</small></li>\n";
+    }
+    echo "</ul>\n";
   }
 }
