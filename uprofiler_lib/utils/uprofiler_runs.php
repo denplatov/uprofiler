@@ -74,14 +74,31 @@ class uprofilerRuns_Default implements iUprofilerRuns {
     return uniqid();
   }
 
-  private function file_name($run_id, $type) {
+  private function file_name($run_id, $type, $for_save = FALSE) {
 
-    $file = "$run_id.$type." . $this->suffix;
+    $result = '';
 
-    if (!empty($this->dir)) {
-      $file = $this->dir . "/" . $file;
+    foreach (explode(',', $type) as $current_type){
+
+      $file = "$run_id.$current_type." . $this->suffix;
+
+      if (!empty($this->dir)) {
+        $file = $this->dir . "/" . $file;
+      }
+
+      if ($for_save) {
+        $result = $file;
+      } else {
+        $result = is_file($file) ? $file : '';
+      }
+
+      if ($result) {
+        break;
+      }
+
     }
-    return $file;
+
+    return $result;
   }
 
   public function __construct($dir = null) {
@@ -138,7 +155,7 @@ class uprofilerRuns_Default implements iUprofilerRuns {
       $run_id = $this->gen_run_id($type);
     }
 
-    $file_name = $this->file_name($run_id, $type);
+    $file_name = $this->file_name($run_id, $type, TRUE);
     $file = fopen($file_name, 'w');
 
     if ($file) {
