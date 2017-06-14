@@ -109,7 +109,8 @@ class uprofilerRuns_Default implements iUprofilerRuns {
     // in which the error_log file resides.
 
     if (empty($dir)) {
-      $dir = ini_get("uprofiler.output_dir");
+	  $loaded_extension = extension_loaded('uprofiler') ? 'uprofiler' : 'xhprof';
+	  $dir = ini_get("{$loaded_extension}.output_dir");
       if (empty($dir)) {
 
         // some default that at least works on unix...
