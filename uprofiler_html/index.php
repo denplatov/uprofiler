@@ -80,7 +80,7 @@ $vbbar = ' class="vbbar"';
 $vrbar = ' class="vrbar"';
 $vgbar = ' class="vgbar"';
 
-$uprofiler_runs_impl = new UprofilerRuns_Default();
+$uprofiler_runs_impl = new UprofilerRuns_Default("/owox/sites/rozetka/profiler");
 
 displayUprofilerReport($uprofiler_runs_impl, $params, $source, $run, $wts,
                     $symbol, $sort, $run1, $run2);
